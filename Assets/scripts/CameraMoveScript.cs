@@ -19,7 +19,7 @@ public class CameraMoveScript : MonoBehaviour {
 	Vector3 topLeft;
     private float theta;  
     private float rawX, rawY, rawScale;
-    private Vector3 facePos = new Vector3(0, 0, -40);
+    private Vector3 facePos = new Vector3(-15, -7, -40);
 
     private float xAid, yAid;   //will use this when calculating face position.
     //computes it here so it doesn't have to every time.
@@ -107,12 +107,12 @@ public class CameraMoveScript : MonoBehaviour {
 		va = pa - pe;
 		vb = pb - pe;
 		vc = pc - pe;
-		eyedistance = -(Vector3.Dot (va, vn));
+		eyedistance = (Vector3.Dot (va, vn));
 
 		left = (Vector3.Dot (vr, va) * near) / eyedistance;
-		right=(Vector3.Dot (vr, vb) * near) / eyedistance;
-		bottom=(Vector3.Dot (vu, va) * near) / eyedistance;
-		top=(Vector3.Dot (vu, vc) * near) / eyedistance;
+		right = (Vector3.Dot (vr, vb) * near) / eyedistance;
+		bottom = (Vector3.Dot (vu, va) * near) / eyedistance;
+		top = (Vector3.Dot (vu, vc) * near) / eyedistance;
 		projectionM = PerspectiveOffCenter (left, right, bottom, top, near, far);
 
 		transformMatrix = new Matrix4x4 ();
@@ -154,7 +154,8 @@ public class CameraMoveScript : MonoBehaviour {
 		finalProjection = new Matrix4x4 ();
 		finalProjection = Matrix4x4.identity * projectionM * transformMatrix * eyeTranslateM;
 
-		return finalProjection;
+		//return finalProjection;
+		return projectionM;
 
 	}
 
