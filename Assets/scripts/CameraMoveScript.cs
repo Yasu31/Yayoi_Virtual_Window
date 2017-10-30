@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class CameraMoveScript : MonoBehaviour {
     //http://thomasfredericks.github.io/UnityOSC/
     public OSC osc;
@@ -12,12 +11,12 @@ public class CameraMoveScript : MonoBehaviour {
     public float numerator = 200;
     public float[] captureSize = { 640, 320 };
 
-	//public Camera cam;
+	//Camera cam;
 
     private bool isReceiving = false;
-	public Vector3 bottomLeft;
-	public Vector3 bottomRight;
-	public Vector3 topLeft;
+	Vector3 bottomLeft;
+	Vector3 bottomRight;
+	Vector3 topLeft;
     private float theta;  
     private float rawX, rawY, rawScale;
     private Vector3 facePos = new Vector3(0, 0, -40);
@@ -42,19 +41,19 @@ public class CameraMoveScript : MonoBehaviour {
 		bottomLeft = new Vector3 (-screenWidth / 2, -screenHeight / 2, 0);
 		bottomRight = new Vector3 (screenWidth / 2, -screenHeight / 2, 0);
 		topLeft = new Vector3 (-screenWidth / 2, screenHeight / 2, 0);
-		cam = GetComponent<Camera> ();
+		//cam = GetComponent<Camera> ();
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void LateUpdate () {
         UpdateFacePos();
-        //transform.position = facePos;
+		Camera cam = Camera.main;
 		Matrix4x4 pm=GeneralizedPerspectiveProjection(bottomLeft, bottomRight, topLeft, facePos, cam.nearClipPlane, cam.farClipPlane);
-		//cam.projectionMatrix = pm;
-		Camera cam=camera;
+		transform.position=facePos;
 		cam.projectionMatrix = pm;
 
 	}
+
 
     void OnReceiveFace(OscMessage message)
     {
@@ -132,7 +131,7 @@ public class CameraMoveScript : MonoBehaviour {
 		transformMatrix [3, 0] = 0;
 		transformMatrix [3, 1] = 0;
 		transformMatrix [3, 2] = 0;
-		transformMatrix [3, 3] = 1;
+		transformMatrix [3, 3] = 1f;
 
 		eyeTranslateM = new Matrix4x4 ();
 		eyeTranslateM [0, 0] = 1;
