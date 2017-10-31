@@ -5,11 +5,15 @@ using UnityEngine;
 public class CameraMoveScript : MonoBehaviour {
     //http://thomasfredericks.github.io/UnityOSC/
     public OSC osc;
-    public float fovDegrees=100;//horizontal fanning. Determining this accurately is important in correct measurements
-    public float screenWidth=30;//in cm
-    public float screenHeight = 17;//in cm
-    public float numerator = 200;
-    public float[] captureSize = { 640, 320 };
+	private float fovDegrees=100;//horizontal fanning. Determining this accurately is important in correct measurements
+	private float screenWidth=30;//in cm
+	private float screenHeight = 17;//in cm
+	private float numerator = 200;
+	private float[] captureSize = { 640, 320 };
+	public enum Device{
+		Macbook_Pro_13in, MBP13_withLens, 学科PC, Macbook_Air
+	}
+	public Device device;
 
 	//Camera cam;
 
@@ -27,6 +31,37 @@ public class CameraMoveScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		switch (device) {
+		case Device.Macbook_Pro_13in:
+			fovDegrees = 90;
+			screenWidth = 30;
+			screenHeight = 17;
+			numerator = 200;
+			captureSize = new float[]{ 640, 320 };
+			break;
+		case Device.MBP13_withLens:
+			fovDegrees = 90;
+			screenWidth = 30;
+			screenHeight = 17;
+			numerator = 130;
+			captureSize = new float[]{ 640, 320 };
+			break;
+		case Device.Macbook_Air:
+			fovDegrees = 90;
+			screenWidth = 30;
+			screenHeight = 17;
+			numerator = 200;
+			captureSize = new float[]{ 640, 320 };
+			break;
+		case Device.学科PC:
+			fovDegrees = 90;
+			screenWidth = 30;
+			screenHeight = 17;
+			numerator = 200;
+			captureSize = new float[]{ 640, 480 };
+			break;
+		}
+			
         osc.SetAddressHandler("/pose/position", OnReceiveFace);
         osc.SetAddressHandler("/pose/scale", onReceiveScale);
 
@@ -42,6 +77,7 @@ public class CameraMoveScript : MonoBehaviour {
 		bottomRight = new Vector3 (screenWidth / 2, -screenHeight / 2, 0);
 		topLeft = new Vector3 (-screenWidth / 2, screenHeight / 2, 0);
 		//cam = GetComponent<Camera> ();
+
     }
 	
 	// Update is called once per frame
@@ -152,10 +188,10 @@ public class CameraMoveScript : MonoBehaviour {
 		eyeTranslateM [3, 3] = 1f;
 
 		finalProjection = new Matrix4x4 ();
-		finalProjection = Matrix4x4.identity * projectionM * transformMatrix * eyeTranslateM;
+		finalProjection = Matrix4x4.identity * projectionM * transformMatrix;//* eyeTranslateM;
 
 		//return finalProjection;
-		return projectionM;
+		return finalProjection;
 
 	}
 
