@@ -1,19 +1,16 @@
 # Virtual_Window_3
 
-## OSC
+## Locate face position via faceOSC
 
-Add OSC
-Added OSC integration per UnityOSC
+Requires [FaceOSC](https://github.com/kylemcdonald/ofxFaceTracker/releases) (by Kyle McDonald) to run in the background in order to receive head position information.
+Uses [UnityOSC](http://thomasfredericks.github.io/UnityOSC/) (by Thomas Fredericks) to receive that information via OSC.
+OSC(Open Sound Control) is a network protocol for transferring data between apps and devices.
 
-## scene
+## Calculating face position
 
-place Yayoi mirror in scene
-much more to do...
+gets raw values of face's X, Y & scale from FaceOSC via OSC, and computes real life coordinates of user's face. Several parameters about the camera and display must be fine-tuned to get an accurate value.
 
-added plane (default size is 10x10) that emulates screen
+## Displays scene
 
-## face position
-
-gets raw values of face's X, Y & scale
-computes real life coordinates of users face
-as of now, the camera moves with the user. no projection tinkering yet.
+A Yayoi mirror is placed in scene, but it is much too heavy to handle with my computer at the moment- must reduce vertices.
+It uses a custom projection matrix, in order to emulate a CAVE environment for the user.
