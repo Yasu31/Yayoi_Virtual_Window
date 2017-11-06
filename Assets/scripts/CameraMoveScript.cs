@@ -54,7 +54,7 @@ public class CameraMoveScript : MonoBehaviour {
 			captureSize = new float[]{ 640, 320 };
 			break;
 		case Device.学科PC:
-			fovDegrees = 90;
+			fovDegrees = 60;
 			screenWidth = 30;
 			screenHeight = 17;
 			numerator = 200;
@@ -119,7 +119,7 @@ public class CameraMoveScript : MonoBehaviour {
         float phiY = -Mathf.Atan((rawY - captureSize[1] / 2) * yAid);
         facePos.x = distance * Mathf.Cos(phiY) * Mathf.Sin(phiX);
         facePos.y = distance * Mathf.Cos(phiX) * Mathf.Sin(phiY) + screenHeight / 2 +4;//eye is higher than face position
-        facePos.z = -distance * Mathf.Cos(phiX)*Mathf.Cos(phiY);
+        facePos.z = -distance;// * Mathf.Cos(phiX)*Mathf.Cos(phiY);
 
         print(facePos);
     }
