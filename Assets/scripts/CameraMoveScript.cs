@@ -41,6 +41,7 @@ public class CameraMoveScript : MonoBehaviour {
     string messagePopup = "";
     private float messagePopupStart;
 
+
     GUIStyle style = new GUIStyle(GUIStyle.none);
 
 
@@ -118,25 +119,32 @@ public class CameraMoveScript : MonoBehaviour {
             case "forest":
                 setMessage("太古の弥生時代の発掘現場です。");
                 break;
+            case "timetravel":
+                setMessage("目を大きくあけていてください。目をつぶると、違う景色が見えてくるでしょう。");
+                break;
             default:
                 setMessage("loaded");
                 break;
         }
 
-        style.fontSize = 50;
+        style.fontSize = 30;
         style.wordWrap = true;
+        style.normal.textColor = Color.red;
+        style.richText = true;
+        
 
     }
 
     private void setMessage(string msg)
     {
-        messagePopup = msg;
+        messagePopup = "<b>"+msg+"</b>";
         messagePopupStart = Time.time;
     }
     private void OnGUI()
     {
         if (Time.time - messagePopupStart < 4)
         {
+            GUI.backgroundColor = Color.black;
             GUI.Button(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 40, 400, 80), messagePopup, style);
         }
     }
