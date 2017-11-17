@@ -11,9 +11,14 @@ public class CameraMoveScript : MonoBehaviour {
 	private float numerator = 200;
 	private float[] captureSize = { 640, 320 };
 	public enum Device{
-		Macbook_Pro_13in, MBP13_withLens, 学科PC, Macbook_Air
-	}
+		Macbook_Pro_13in, MBP13_withLens, 学科PC, Macbook_Air, snoopy_kali, TV47
+    }
 	public Device device;
+    public enum Webcam
+    {
+        学科PC, MBP, MBP_with_lens, Buffalo
+    }
+    public Webcam webcam;
 
 	//Camera cam;
 
@@ -21,51 +26,70 @@ public class CameraMoveScript : MonoBehaviour {
 	Vector3 bottomLeft;
 	Vector3 bottomRight;
 	Vector3 topLeft;
-    private float theta;  
+    private float theta;
     private float rawX, rawY, rawScale;
     private Vector3 facePos = new Vector3(-15, -7, -40);
 
     private float xAid, yAid;   //will use this when calculating face position.
     //computes it here so it doesn't have to every time.
-    
+
 
 	// Use this for initialization
 	void Start () {
 		switch (device) {
 		case Device.Macbook_Pro_13in:
-			fovDegrees = 90;
 			screenWidth = 30;
 			screenHeight = 17;
-			numerator = 200;
-			captureSize = new float[]{ 640, 320 };
 			break;
 		case Device.MBP13_withLens:
-			fovDegrees = 90;
 			screenWidth = 30;
 			screenHeight = 17;
-			numerator = 130;
-			captureSize = new float[]{ 640, 320 };
 			break;
 		case Device.Macbook_Air:
-			fovDegrees = 90;
 			screenWidth = 30;
 			screenHeight = 17;
-			numerator = 200;
-			captureSize = new float[]{ 640, 320 };
 			break;
 		case Device.学科PC:
-			fovDegrees = 60;
 			screenWidth = 30;
 			screenHeight = 17;
-			numerator = 200;
-			captureSize = new float[]{ 640, 480 };
 			break;
-		}
-			
+        case Device.snoopy_kali:
+            screenWidth = 150;
+            screenHeight = 75;
+            break;
+        case Device.TV47:
+            screenWidth = 104;
+            screenHeight = 59;
+            break;
+        }
+        switch (webcam)
+        {
+            case Webcam.MBP:
+                fovDegrees = 90;
+                numerator = 200;
+                captureSize = new float[] { 640, 320 };
+                break;
+            case Webcam.MBP_with_lens:
+                fovDegrees = 90;
+                numerator = 130;
+                captureSize = new float[] { 640, 320 };
+                break;
+            case Webcam.学科PC:
+                fovDegrees = 60;
+                numerator = 200;
+                captureSize = new float[] { 640, 480 };
+                break;
+            case Webcam.Buffalo:
+                fovDegrees = 120;
+                numerator = 200;
+                captureSize = new float[] { 640, 480 };
+                break;
+        }
+
         osc.SetAddressHandler("/pose/position", OnReceiveFace);
         osc.SetAddressHandler("/pose/scale", onReceiveScale);
 
-        theta = fovDegrees * (3.14f / 180);//horizontal fanning of camera in radians 
+        theta = fovDegrees * (3.14f / 180);//horizontal fanning of camera in radians
 
         //will use these values later to compute face position.
         //it's calculated here to save the effort of having to compute every frame
@@ -79,7 +103,7 @@ public class CameraMoveScript : MonoBehaviour {
 		//cam = GetComponent<Camera> ();
 
     }
-	
+
 	// Update is called once per frame
 	void LateUpdate () {
         UpdateFacePos();
