@@ -6,5 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/scenes/scene.unity
+    path: Assets/scenes/forest.unity
     guid: 1d6af8eb7119b0447a75bc296be91fcd
+  - enabled: 1
+    path: Assets/scenes/scene2.unity
+    guid: 61f87880c03822b4e8c89e57ad894a48
+  - enabled: 1
+    path: Assets/scenes/timetravel.unity
+    guid: 9d9cb83e56349824c9a5b800f0f713cc

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraMoveScript : MonoBehaviour {
     //http://thomasfredericks.github.io/UnityOSC/
@@ -9,16 +10,17 @@ public class CameraMoveScript : MonoBehaviour {
 	private float screenWidth=30;//in cm
 	private float screenHeight = 17;//in cm
 	private float numerator = 200;
+    private int numOfScenes = 3;
 	private float[] captureSize = { 640, 320 };
 	public enum Device{
 		Macbook_Pro_13in, MBP13_withLens, 学科PC, Macbook_Air, snoopy_kali, TV47
     }
-	public Device device;
+	private Device device=Device.Macbook_Pro_13in;
     public enum Webcam
     {
         学科PC, MBP, MBP_with_lens, Buffalo
     }
-    public Webcam webcam;
+    private Webcam webcam=Webcam.MBP;
 
 	//Camera cam;
 
@@ -33,9 +35,17 @@ public class CameraMoveScript : MonoBehaviour {
     private float xAid, yAid;   //will use this when calculating face position.
     //computes it here so it doesn't have to every time.
 
+    private bool wasOpen = false; //to check if in previous data, mouth was open.
+    private float openStartTime;
 
-	// Use this for initialization
-	void Start () {
+    string messagePopup = "";
+    private float messagePopupStart;
+
+    GUIStyle style = new GUIStyle(GUIStyle.none);
+
+
+    // Use this for initialization
+    void Start () {
 		switch (device) {
 		case Device.Macbook_Pro_13in:
 			screenWidth = 30;
@@ -88,6 +98,7 @@ public class CameraMoveScript : MonoBehaviour {
 
         osc.SetAddressHandler("/pose/position", OnReceiveFace);
         osc.SetAddressHandler("/pose/scale", onReceiveScale);
+        osc.SetAddressHandler("/gesture/mouth/height", onReceiveJaw);
 
         theta = fovDegrees * (3.14f / 180);//horizontal fanning of camera in radians
 
@@ -100,18 +111,47 @@ public class CameraMoveScript : MonoBehaviour {
 		bottomLeft = new Vector3 (-screenWidth / 2, -screenHeight / 2, 0);
 		bottomRight = new Vector3 (screenWidth / 2, -screenHeight / 2, 0);
 		topLeft = new Vector3 (-screenWidth / 2, screenHeight / 2, 0);
-		//cam = GetComponent<Camera> ();
+        //cam = GetComponent<Camera> ();
+
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "forest":
+                setMessage("太古の弥生時代の発掘現場です。");
+                break;
+            default:
+                setMessage("loaded");
+                break;
+        }
+
+        style.fontSize = 50;
+        style.wordWrap = true;
 
     }
 
-	// Update is called once per frame
-	void LateUpdate () {
+    private void setMessage(string msg)
+    {
+        messagePopup = msg;
+        messagePopupStart = Time.time;
+    }
+    private void OnGUI()
+    {
+        if (Time.time - messagePopupStart < 4)
+        {
+            GUI.Button(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 40, 400, 80), messagePopup, style);
+        }
+    }
+
+
+    // Update is called once per frame
+    void LateUpdate () {
         UpdateFacePos();
 		Camera cam = Camera.main;
 		Matrix4x4 pm=GeneralizedPerspectiveProjection(bottomLeft, bottomRight, topLeft, facePos, cam.nearClipPlane, cam.farClipPlane);
 		transform.position=facePos;
 		cam.projectionMatrix = pm;
 
+        if (Input.GetMouseButtonDown(0))
+            changeScene();
 	}
 
 
@@ -131,6 +171,27 @@ public class CameraMoveScript : MonoBehaviour {
         //to determine if it's actually been receiving data for a while
         isReceiving = true;
     }
+    void onReceiveJaw(OscMessage message)
+    {
+        if (message.GetFloat(0) > 5)
+        {
+            if (!wasOpen)
+            {
+                print("detect open");
+                wasOpen = true;
+                openStartTime = Time.time;
+            }
+            if(Time.time-openStartTime > 2.0)
+            {
+                wasOpen = false;
+                changeScene();
+            }
+        }
+        else
+        {
+            wasOpen = false;
+        }
+    }
     void UpdateFacePos()
     {
         if (!isReceiving)
@@ -145,7 +206,14 @@ public class CameraMoveScript : MonoBehaviour {
         facePos.y = distance * Mathf.Cos(phiX) * Mathf.Sin(phiY) + screenHeight / 2 +4;//eye is higher than face position
         facePos.z = -distance;// * Mathf.Cos(phiX)*Mathf.Cos(phiY);
 
-        print(facePos);
+        //print(facePos);
+    }
+
+    void changeScene()
+    {
+        print("changing scene..");
+        setMessage("次のシーンをロード中...");
+        SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % numOfScenes);
     }
 	public static Matrix4x4 GeneralizedPerspectiveProjection(Vector3 pa, Vector3 pb, Vector3 pc, Vector3 pe, float near, float far){
 		Vector3 va, vb, vc;
@@ -247,5 +315,27 @@ public class CameraMoveScript : MonoBehaviour {
 		m[3, 3] = 0;
 		return m;
 	}
+
+    //tried to have the window settings to be user-definable, but I don't have time now.
+    //    private Rect windowrect = new Rect(0, 0, 120, 120);
+    //   private int fov;
+    //    private int captureWidth;
+    //    private int captureHeight;
+    //    private int screenWidth2;
+    //    private int screenHeight2;
+    //    private int numerator2;
+    //    void OnGUI()
+    //    {
+    //       windowrect = GUI.Window(0, windowrect, DoMyWindow, "configuration");
+    //
+    //    }
+
+    //    void DoMyWindow()
+    //    {
+    //        GUI.Label(new Rect(0, 0, 60, 20), "fov");
+    //        GUI.TextField(new Rect(60,0,60,20), )
+    //    }
+
+
 
 }

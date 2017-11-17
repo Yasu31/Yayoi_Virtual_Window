@@ -353,7 +353,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400000, guid: 2be6b55b9e420ea42b09a14982afbac2, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 138887964}
-  m_LocalRotation: {x: -0.53375936, y: -0.61342186, z: -0.16660634, w: -0.5577247}
+  m_LocalRotation: {x: -0.5337594, y: -0.6134219, z: -0.16660635, w: -0.5577248}
   m_LocalPosition: {x: -2289, y: -991, z: -299}
   m_LocalScale: {x: 1.8250937, y: 1.8250952, z: 1.8250954}
   m_Children: []
@@ -4332,7 +4332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   osc: {fileID: 1646802418}
-  device: 5
+  device: 2
   webcam: 0
 --- !u!81 &1740148539
 AudioListener:
