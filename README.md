@@ -1,4 +1,4 @@
-![Virtual Window](https://github.com/Yasu31/Yayoi-Virtual-Window/blob/master/images/3.png)
+![Virtual Window](https://github.com/Yasu31/Yayoi_Virtual_Window/blob/master/images/3.png)
 # Introduction/紹介
 created using [Virtual Window for Unity](https://github.com/Yasu31/Virtual-Window-for-Unity)(to be accurate, VW for Unity was created out of necessity while I was making Yayoi VW)- a Unity program, easily integrable to projects, that lets the computer screen act as a "virtual window"
 
@@ -44,7 +44,7 @@ spacebar
 
 スペースキー
 ## Scenes/シーン
-![Scenes](https://github.com/Yasu31/Yayoi-Virtual-Window/blob/master/images/2.png)
+![Scenes](https://github.com/Yasu31/Yayoi_Virtual_Window/blob/master/images/2.png)
 
 ## How it works/しくみ
-![How it works](https://github.com/Yasu31/Yayoi-Virtual-Window/blob/master/images/1.png)
+![How it works](https://github.com/Yasu31/Yayoi_Virtual_Window/blob/master/images/1.png)
