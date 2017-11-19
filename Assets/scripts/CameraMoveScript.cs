@@ -21,8 +21,10 @@ public class CameraMoveScript : MonoBehaviour {
         学科PC, MBP, MBP_with_lens, Buffalo
     }
     private Webcam webcam=Webcam.MBP;
+    private bool isAutoMove=false;
+    private Vector3 origin;
 
-	//Camera cam;
+    //Camera cam;
 
     private bool isReceiving = false;
 	Vector3 bottomLeft;
@@ -35,11 +37,16 @@ public class CameraMoveScript : MonoBehaviour {
     private float xAid, yAid;   //will use this when calculating face position.
     //computes it here so it doesn't have to every time.
 
+    private float focus;
+
     private bool wasOpen = false; //to check if in previous data, mouth was open.
     private float openStartTime;
 
     string messagePopup = "";
     private float messagePopupStart;
+    private float speed = 30f;
+
+    public GameObject cameraBox;
 
 
     GUIStyle style = new GUIStyle(GUIStyle.none);
@@ -69,8 +76,8 @@ public class CameraMoveScript : MonoBehaviour {
             screenHeight = 75;
             break;
         case Device.TV47:
-            screenWidth = 104;
-            screenHeight = 59;
+            screenWidth = 102;
+            screenHeight = 57;
             break;
         }
         switch (webcam)
@@ -92,7 +99,7 @@ public class CameraMoveScript : MonoBehaviour {
                 break;
             case Webcam.Buffalo:
                 fovDegrees = 120;
-                numerator = 200;
+                numerator = 90;
                 captureSize = new float[] { 640, 480 };
                 break;
         }
@@ -120,7 +127,10 @@ public class CameraMoveScript : MonoBehaviour {
                 setMessage("太古の弥生時代の発掘現場です。");
                 break;
             case "timetravel":
-                setMessage("目を大きくあけていてください。目をつぶると、違う景色が見えてくるでしょう。");
+                setMessage("目を大きくあけていてください。目をつぶると、違う景色が見えてくるでしょう。(又はクリック)");
+                break;
+            case "museum":
+                setMessage("貴重な収集品が展示されているミュージアムです。マウスのボタンで移動してみてください。");
                 break;
             default:
                 setMessage("loaded");
@@ -131,8 +141,10 @@ public class CameraMoveScript : MonoBehaviour {
         style.wordWrap = true;
         style.normal.textColor = Color.red;
         style.richText = true;
-        
 
+        focus = captureSize[0] / 2 / Mathf.Tan(theta / 2);
+
+        origin = cameraBox.transform.position;
     }
 
     private void setMessage(string msg)
@@ -151,19 +163,60 @@ public class CameraMoveScript : MonoBehaviour {
 
 
     // Update is called once per frame
-    void LateUpdate () {
+    void Update()
+    {
         UpdateFacePos();
-		Camera cam = Camera.main;
-		Matrix4x4 pm=GeneralizedPerspectiveProjection(bottomLeft, bottomRight, topLeft, facePos, cam.nearClipPlane, cam.farClipPlane);
-		transform.position=facePos;
-		cam.projectionMatrix = pm;
+        Camera cam = Camera.main;
+        Matrix4x4 pm = GeneralizedPerspectiveProjection(bottomLeft, bottomRight, topLeft, facePos, cam.nearClipPlane, cam.farClipPlane);
+        transform.localPosition = facePos;
+        cam.projectionMatrix = pm;
 
-        if (Input.GetMouseButtonDown(0))
-            changeScene();
-	}
+        if (Input.GetKeyDown(KeyCode.Return))
+            changeScene(-1);
+
+        if (Input.GetKeyDown(KeyCode.M))
+            isAutoMove = !isAutoMove;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            cameraBox.transform.position = origin;
+
+        if (isAutoMove)
+        {
+            if (facePos.x > 50)
+                cameraBox.transform.Translate(cameraBox.transform.right * Time.deltaTime * speed);
+            else if (facePos.x < -50)
+                cameraBox.transform.Translate(-1 * cameraBox.transform.right * Time.deltaTime * speed);
+            if (facePos.z > (-70))
+                cameraBox.transform.Translate(cameraBox.transform.forward * Time.deltaTime * speed);
+            else if (facePos.z < (-120))
+                cameraBox.transform.Translate(-1 * cameraBox.transform.forward * Time.deltaTime * speed);
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow))
+            cameraBox.transform.Translate(cameraBox.transform.right*Time.deltaTime*speed);
+        if (Input.GetKey(KeyCode.LeftArrow))
+            cameraBox.transform.Translate(-1* cameraBox.transform.right* Time.deltaTime * speed);
+        if (Input.GetKey(KeyCode.UpArrow))
+            cameraBox.transform.Translate(cameraBox.transform.forward * Time.deltaTime * speed);
+        if (Input.GetKey(KeyCode.DownArrow))
+            cameraBox.transform.Translate(-1 * cameraBox.transform.forward * Time.deltaTime * speed);
+
+        //マウス
+        float mouseWheelScroll = Input.GetAxis("Mouse ScrollWheel");
+        cameraBox.transform.Translate(this.transform.forward * (20) * mouseWheelScroll);
+
+        if (Input.GetMouseButton(1))
+        {
+            cameraBox.transform.Translate(transform.right * speed * Time.deltaTime);
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            cameraBox.transform.Translate(-1*transform.right * speed * Time.deltaTime);
+        }
+    }
 
 
-    void OnReceiveFace(OscMessage message)
+        void OnReceiveFace(OscMessage message)
     {
         rawX = message.GetFloat(0);
         //0~640
@@ -192,7 +245,7 @@ public class CameraMoveScript : MonoBehaviour {
             if(Time.time-openStartTime > 2.0)
             {
                 wasOpen = false;
-                changeScene();
+                changeScene(-1);
             }
         }
         else
@@ -207,21 +260,40 @@ public class CameraMoveScript : MonoBehaviour {
             print("is not receiving face data from faceOSC");
             return;
         }
-        float distance = numerator / rawScale;
-        float phiX = -Mathf.Atan((rawX - captureSize[0] / 2) * xAid);
-        float phiY = -Mathf.Atan((rawY - captureSize[1] / 2) * yAid);
-        facePos.x = distance * Mathf.Cos(phiY) * Mathf.Sin(phiX);
-        facePos.y = distance * Mathf.Cos(phiX) * Mathf.Sin(phiY) + screenHeight / 2 +4;//eye is higher than face position
-        facePos.z = -distance;// * Mathf.Cos(phiX)*Mathf.Cos(phiY);
+        //float distance = numerator / rawScale;
+        //float phiX = -Mathf.Atan((rawX - captureSize[0] / 2) * xAid);
+        //float phiY = -Mathf.Atan((rawY - captureSize[1] / 2) * yAid);
+        //facePos.x = distance * Mathf.Cos(phiY) * Mathf.Sin(phiX);
+        //facePos.y = distance * Mathf.Cos(phiX) * Mathf.Sin(phiY) + screenHeight / 2 +4;//eye is higher than face position
+        //facePos.z = -distance;// * Mathf.Cos(phiX)*Mathf.Cos(phiY);
 
-        //print(facePos);
+        //isAutoMove = true;
+        float distance = numerator / rawScale;
+        facePos.x = -(rawX - captureSize[0] / 2) * distance / focus;
+        facePos.y = -(rawY - captureSize[1] / 2) * distance / focus+screenHeight/2;
+        facePos.z = -distance;
+
+        print(facePos);
     }
 
-    void changeScene()
+    void changeScene(int a)
     {
+        int index = SceneManager.GetActiveScene().buildIndex;
+        if (a == -1)
+        {
+            index = (index + 1) % numOfScenes;
+        }
+        else if (a == -2)
+        {
+            index = (index - 1 +numOfScenes) % numOfScenes;
+        }
+        else if (0<=a && a<numOfScenes)
+        {
+            index = a;
+        }
         print("changing scene..");
         setMessage("次のシーンをロード中...");
-        SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % numOfScenes);
+        SceneManager.LoadScene(index);
     }
 	public static Matrix4x4 GeneralizedPerspectiveProjection(Vector3 pa, Vector3 pb, Vector3 pc, Vector3 pe, float near, float far){
 		Vector3 va, vb, vc;

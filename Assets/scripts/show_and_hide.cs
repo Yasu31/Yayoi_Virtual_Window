@@ -27,7 +27,7 @@ public class show_and_hide : MonoBehaviour {
     }
 	private void OnReceiveEye(OscMessage msg)
     {
-        if(Time.time < 2)
+        if(Time.time < 1.5)
         {
             //calibration should not start immediately
             return;
@@ -46,7 +46,7 @@ public class show_and_hide : MonoBehaviour {
         }
         else
         {
-            if (msg.GetFloat(0) < average-0.3)
+            if (msg.GetFloat(0) < average-0.2)
             {
                 if (!wasClosed)
                 {
@@ -79,7 +79,7 @@ public class show_and_hide : MonoBehaviour {
     }
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(2))
         {
             mode = !mode;
             everyObject.SetActive(mode);
