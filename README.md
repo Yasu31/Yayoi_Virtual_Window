@@ -9,6 +9,8 @@ created using [Virtual Window for Unity](https://github.com/Yasu31/Virtual-Windo
 ## Requirements/必要なもの
 ### webcam & [FaceOSC](https://github.com/kylemcdonald/ofxFaceTracker/releases) software/ウェブカメラと[FaceOSC](https://github.com/kylemcdonald/ofxFaceTracker/releases)ソフトウェア
 to track user's face. This software is required to be running while Virtual Window is running. Sends face position & gesture data over [OSC](http://opensoundcontrol.org/introduction-osc), a network protocol for transferring data between apps and devices.
+### Unity
+これはUnityプロジェクトなので、[Unity](https://unity3d.com/)をダウンロードし、それで開く必要があります。Unityについては数多くのウェブサイトや書籍があるので、このプロジェクトを実行するだけならすぐにできると思います。
 
 使用者の顔の位置を取得するために必要です。Yayoi Virtual Windowが動いている間、FaceOSCが背後で動いている必要があります。
 ## Control/操作
